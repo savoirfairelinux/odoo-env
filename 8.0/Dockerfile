@@ -1,5 +1,5 @@
 FROM buildpack-deps:trusty-scm
-MAINTAINER <support@savoirfairelinux.com> Savoir-faire Linux
+MAINTAINER <support@savoirfairelinux.com> Savoir-faire Linux Inc.
 
 RUN set -x; \
     apt-get update && \
@@ -32,15 +32,20 @@ RUN useradd -d /var/odoo8 odoo8 && \
 USER odoo8
 
 # Run a fake buildout to install depency eggs
-RUN mkdir -p /var/odoo8/.buildout/
+RUN mkdir -p /var/odoo8/.buildout/eggs && \
+    mkdir /var/odoo8/fake_build
 COPY default.cfg /var/odoo8/.buildout/
-RUN mkdir /var/odoo8/fake_build
 COPY buildout.cfg /var/odoo8/fake_build/
 
-RUN cd /var/odoo8/fake_build && \
+RUN set -x; \
+    cd /var/odoo8/fake_build && \
     curl -o requirements.txt -SL https://github.com/odoo/odoo/raw/8.0/requirements.txt && \
     curl -o bootstrap-buildout.py -SL https://bootstrap.pypa.io/bootstrap-buildout.py && \
+    curl -o pydot-1.0.2.tar.gz -SL http://pydot.googlecode.com/files/pydot-1.0.2.tar.gz && \
+    tar xzf pydot-1.0.2.tar.gz && \
     python bootstrap-buildout.py && \
+    /var/odoo8/fake_build/bin/buildout setup pydot-1.0.2/setup.py bdist_egg && \
+    mv pydot-1.0.2/dist/* /var/odoo8/.buildout/eggs/ && \
     /var/odoo8/fake_build/bin/buildout && \
     rm -rf /var/odoo8/fake_build
 

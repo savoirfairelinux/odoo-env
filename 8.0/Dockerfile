@@ -4,8 +4,6 @@ MAINTAINER <support@savoirfairelinux.com> Savoir-faire Linux Inc.
 RUN set -x; \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential \
-        python \
         python-dev \
         libxml2-dev \
         libxslt1-dev \
@@ -17,6 +15,7 @@ RUN set -x; \
         libldap2-dev \
         libyaml-dev \
         fontconfig \
+        freetds-dev \
         npm && \
         npm install -g less less-plugin-clean-css && \
         curl -o wkhtmltox.deb -SL http://download.gna.org/wkhtmltopdf/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-amd64.deb && \

@@ -5,6 +5,9 @@ RUN set -x; \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         gcc \
+        patch \
+        xz-utils \
+        postgresql-client \
         python-dev \
         libxml2-dev \
         libxslt1-dev \

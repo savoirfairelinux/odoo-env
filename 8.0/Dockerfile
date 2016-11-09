@@ -76,7 +76,7 @@ USER ${USER}
 
 WORKDIR /opt/${USER}/
 
-RUN echo "[buildout]\neggs-directory = /opt/${USER}/.buildout/eggs\n" > .buildout/defaults.cfg && \
+RUN echo "[buildout]\neggs-directory = /opt/${USER}/.buildout/eggs\n" > .buildout/default.cfg && \
     ls -la
 
 EXPOSE 8069 8071

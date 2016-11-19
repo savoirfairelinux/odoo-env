@@ -19,16 +19,26 @@ ENV dev_packages python-dev \
     patch \
     make
 
+RUN set -x; \
+    locale-gen en_US.UTF-8 && \
+    update-locale && \
+    echo 'LANG="en_US.UTF-8"' > /etc/default/locale
+
+RUN set -x; \
+    apt-get update && \
+    apt-get install -y curl && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+
 COPY buildout.cfg /fake_buildout/
 
 RUN set -x; \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         git \
-	curl \
 	ca-certificates \
         xz-utils \
-        postgresql-client \
+        postgresql-client-9.5 \
 	fontconfig \
 	libxrender1 \
 	libxext6 \

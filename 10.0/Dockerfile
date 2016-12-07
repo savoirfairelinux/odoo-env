@@ -2,7 +2,7 @@ FROM ubuntu:14.04
 MAINTAINER <support@savoirfairelinux.com> Savoir-faire Linux Inc.
 
 ENV USER odoo
-ENV VERSION 8.0
+ENV VERSION 10.0
 ENV dev_packages python-dev \
     libxml2-dev \
     libxslt1-dev \

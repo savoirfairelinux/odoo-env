@@ -30,6 +30,7 @@ RUN set -x; \
     curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 COPY buildout.cfg /fake_buildout/
+COPY requirements-extra.txt /tmp/
 
 RUN set -x; \
     apt-get update && \
@@ -52,12 +53,13 @@ RUN set -x; \
         pip install urllib3[secure] && \
 	curl -o requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
 	pip install -r requirements.txt && \
+	pip install -r requirements-extra.txt && \
 	cd /fake_buildout && \
         curl -o bootstrap-buildout.py -SL https://bootstrap.pypa.io/bootstrap-buildout.py && \
         curl -o requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
         awk -F== '{print "     " $1}' requirements.txt >> buildout.cfg && \
         sed -i 's|==| = |' requirements.txt && \
-        echo "\n[versions]\nnum2words = 0.5.3\ngeoip = 1.3.2\nsphinx = 1.3.1\nanybox.recipe.odoo = 1.9.2\ncp.recipe.cmd = 0.5\nzope.testing = 4.5.0\nzope.interface = 4.1.3\nzope.exceptions = 4.0.8\nz3c.recipe.filetemplate = 2.2.0\ncoverage = 4.2\npymssql = 2.1.3\nSQLAlchemy = 1.1.4\n" >> buildout.cfg && \
+        echo "\n[versions]\nnum2words = 0.5.3\ngeoip = 1.3.2\nsphinx = 1.3.1\nanybox.recipe.odoo = 1.9.2\ncp.recipe.cmd = 0.5\nzope.testing = 4.5.0\nzope.interface = 4.1.3\nzope.exceptions = 4.0.8\nz3c.recipe.filetemplate = 2.2.0\npymssql = 2.1.3\nSQLAlchemy = 1.1.4\n" >> buildout.cfg && \
         cat requirements.txt >> buildout.cfg && \
         cat buildout.cfg && \
         python bootstrap-buildout.py && \

@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 MAINTAINER <support@savoirfairelinux.com> Savoir-faire Linux Inc.
 
 ENV USER odoo
@@ -16,18 +16,13 @@ ENV dev_packages python-dev \
     libffi-dev \
     libgeoip-dev \
     gcc \
-    make
+    make \
+    file
 
 RUN set -x; \
     locale-gen en_US.UTF-8 && \
     update-locale && \
     echo 'LANG="en_US.UTF-8"' > /etc/default/locale
-
-RUN set -x; \
-    apt-get update && \
-    apt-get install -y curl && \
-    echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 COPY buildout.cfg /fake_buildout/
 COPY requirements-extra.txt /tmp/
@@ -43,6 +38,8 @@ RUN set -x; \
 	libxrender1 \
 	libxext6 \
 	patch \
+	curl \
+	bzip2 \
 	${dev_packages} \
         npm && \
         ln -s /usr/bin/nodejs /usr/bin/node && \

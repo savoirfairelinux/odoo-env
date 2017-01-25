@@ -15,6 +15,7 @@ ENV dev_packages python-dev \
     freetds-dev \
     libffi-dev \
     libgeoip-dev \
+    libyaml-dev \
     gcc \
     make \
     file
@@ -26,6 +27,10 @@ RUN set -x; \
 
 COPY buildout.cfg /fake_buildout/
 COPY requirements-extra.txt /tmp/
+
+RUN set -x; mkdir -p /root/.buildout && mkdir -p /opt/${USER}/.buildout
+
+COPY default.cfg /root/.buildout/
 
 RUN set -x; \
     apt-get update && \
@@ -40,33 +45,34 @@ RUN set -x; \
 	patch \
 	curl \
 	bzip2 \
+	ssh \
 	${dev_packages} \
         npm && \
-        ln -s /usr/bin/nodejs /usr/bin/node && \
-        npm install -g less less-plugin-clean-css && \
-        cd /tmp && \
-        curl -o get-pip.py -SL https://bootstrap.pypa.io/get-pip.py && \
-        python get-pip.py && \
-        pip install urllib3[secure] && \
-	curl -o requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
-	pip install -r requirements.txt && \
-	pip install -r requirements-extra.txt && \
-	cd /fake_buildout && \
-        curl -o bootstrap-buildout.py -SL https://bootstrap.pypa.io/bootstrap-buildout.py && \
-        curl -o requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
-        awk -F== '{print "     " $1}' requirements.txt >> buildout.cfg && \
-        sed -i 's|==| = |' requirements.txt && \
-        echo "\n[versions]\nnum2words = 0.5.3\ngeoip = 1.3.2\nsphinx = 1.3.1\nanybox.recipe.odoo = 1.9.2\ncp.recipe.cmd = 0.5\nzope.testing = 4.5.0\nzope.interface = 4.1.3\nzope.exceptions = 4.0.8\nz3c.recipe.filetemplate = 2.2.0\npymssql = 2.1.3\nSQLAlchemy = 1.1.4\n" >> buildout.cfg && \
-        cat requirements.txt >> buildout.cfg && \
-        cat buildout.cfg && \
-        python bootstrap-buildout.py && \
-        bin/buildout && \
-        mkdir -p /opt/${USER}/.buildout && \
-	mv eggs /opt/${USER}/.buildout/ && \
-	cd .. && \
-	rm -rf fake_buildout && \
-	apt-get -y remove ${dev_packages} && \
-	apt-get clean all
+    ln -s /usr/bin/nodejs /usr/bin/node && \
+    npm install -g less less-plugin-clean-css && \
+    curl -o /tmp/requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
+    cd /fake_buildout && \
+    curl -o bootstrap-buildout.py -SL https://bootstrap.pypa.io/bootstrap-buildout.py && \
+    curl -o /tmp/requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
+    awk -F== '{print "     " $1}' /tmp/requirements.txt >> buildout.cfg && \
+    awk -F== '{print "     " $1}' /tmp/requirements-extra.txt >> buildout.cfg && \
+    sed 's|==| = |' /tmp/requirements.txt > buildout-requirements.txt && \
+    sed 's|==| = |' /tmp/requirements-extra.txt > buildout-requirements-extra.txt && \
+    echo "\n[versions]\n" >> buildout.cfg && \
+    cat buildout-requirements.txt >> buildout.cfg && \
+    cat buildout-requirements-extra.txt >> buildout.cfg && \
+    python2.7 bootstrap-buildout.py && \
+    bin/buildout && \
+    ls -la /opt/${USER}/.buildout/eggs && \
+    curl -o get-pip.py -SL https://bootstrap.pypa.io/get-pip.py && \
+    python get-pip.py && \
+    pip install urllib3[secure] && \
+    pip install -r /tmp/requirements.txt && \
+    pip install -r /tmp/requirements-extra.txt && \
+    cd .. && \
+    rm -rf fake_buildout && \
+    apt-get -y remove ${dev_packages} && \
+    apt-get clean all
 
 RUN set -x; \
     curl -SL http://download.gna.org/wkhtmltopdf/0.12/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz | \
@@ -77,6 +83,7 @@ RUN set -x; \
     tar xj --strip-components=2 -C /usr/local/bin/ phantomjs-2.1.1-linux-x86_64/bin/phantomjs
 
 RUN set -x; \
+    mv /root/.buildout/default.cfg /opt/${USER}/.buildout/ && \
     mkdir /opt/${USER}/git && \
     useradd -d /opt/${USER} ${USER} && \
     chown -R ${USER}:${USER} /opt/${USER}
@@ -84,7 +91,5 @@ RUN set -x; \
 USER ${USER}
 
 WORKDIR /opt/${USER}/
-
-RUN echo "[buildout]\neggs-directory = /opt/${USER}/.buildout/eggs\n" > .buildout/default.cfg
 
 EXPOSE 8069 8071

@@ -40,6 +40,7 @@ RUN set -x; \
 	patch \
 	curl \
 	bzip2 \
+	ssh \
 	${dev_packages} \
         npm && \
         ln -s /usr/bin/nodejs /usr/bin/node && \
@@ -49,15 +50,20 @@ RUN set -x; \
         python get-pip.py && \
         pip install urllib3[secure] && \
 	curl -o requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
+	# Workaround for the pip + zc.recipe.egg + whell issue https://github.com/pypa/pip/issues/3028
+	pip install --no-cache-dir zc.recipe.egg && \
 	pip install -r requirements.txt && \
 	pip install -r requirements-extra.txt && \
 	cd /fake_buildout && \
         curl -o bootstrap-buildout.py -SL https://bootstrap.pypa.io/bootstrap-buildout.py && \
         curl -o requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
         awk -F== '{print "     " $1}' requirements.txt >> buildout.cfg && \
-        sed -i 's|==| = |' requirements.txt && \
-        echo "\n[versions]\nnum2words = 0.5.3\ngeoip = 1.3.2\nsphinx = 1.3.1\nanybox.recipe.odoo = 1.9.2\ncp.recipe.cmd = 0.5\nzope.testing = 4.5.0\nzope.interface = 4.1.3\nzope.exceptions = 4.0.8\nz3c.recipe.filetemplate = 2.2.0\npymssql = 2.1.3\nSQLAlchemy = 1.1.4\n" >> buildout.cfg && \
+        awk -F== '{print "     " $1}' /tmp/requirements-extra.txt >> buildout.cfg && \
+	sed -i 's|==| = |' requirements.txt && \
+	sed -i 's|==| = |' /tmp/requirements-extra.txt && \
+	echo "\n[versions]\n" >> buildout.cfg && \
         cat requirements.txt >> buildout.cfg && \
+	cat /tmp/requirements-extra.txt >> buildout.cfg && \
         cat buildout.cfg && \
         python bootstrap-buildout.py && \
         bin/buildout && \

@@ -51,7 +51,7 @@ RUN set -x; \
         pip install urllib3[secure] && \
 	curl -o requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
 	# Workaround for the pip + zc.recipe.egg + whell issue https://github.com/pypa/pip/issues/3028
-	pip install --no-cache-dir zc.recipe.egg && \
+	#pip install --no-cache-dir zc.recipe.egg && \
 	pip install -r requirements.txt && \
 	pip install -r requirements-extra.txt && \
 	cd /fake_buildout && \
@@ -65,7 +65,7 @@ RUN set -x; \
         cat requirements.txt >> buildout.cfg && \
 	cat /tmp/requirements-extra.txt >> buildout.cfg && \
         cat buildout.cfg && \
-        python bootstrap-buildout.py && \
+        python2.7 bootstrap-buildout.py && \
         bin/buildout && \
         mkdir -p /opt/${USER}/.buildout && \
 	mv eggs /opt/${USER}/.buildout/ && \

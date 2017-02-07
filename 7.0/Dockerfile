@@ -2,7 +2,7 @@ FROM ubuntu:14.04
 MAINTAINER <support@savoirfairelinux.com> Savoir-faire Linux Inc.
 
 ENV USER odoo
-ENV VERSION 8.0
+ENV VERSION 7.0
 ENV dev_packages python-dev \
     libxml2-dev \
     libxslt1-dev \
@@ -10,6 +10,7 @@ ENV dev_packages python-dev \
     libjpeg-dev \
     libpq-dev \
     libsasl2-dev \
+    libssl-dev \
     libldap2-dev \
     libyaml-dev \
     freetds-dev \
@@ -49,12 +50,8 @@ RUN set -x; \
     curl \
     bzip2 \
     ssh \
-    ${dev_packages} \
-        npm && \
-    ln -s /usr/bin/nodejs /usr/bin/node && \
-    npm install -g less less-plugin-clean-css
-
-RUN cd /fake_buildout && \
+    ${dev_packages} && \
+    cd /fake_buildout && \
     curl -o bootstrap-buildout.py -SL https://bootstrap.pypa.io/bootstrap-buildout.py && \
     echo "\n[versions]\n" >> buildout.cfg && \
     python2.7 bootstrap-buildout.py && \
@@ -70,10 +67,6 @@ RUN cd /fake_buildout && \
 RUN set -x; \
     curl -SL http://download.gna.org/wkhtmltopdf/0.12/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz | \
     tar xJ --strip-components=2 -C /usr/local/bin/ wkhtmltox/bin/wkhtmltopdf
-
-RUN set -x; \
-    curl -SL https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 | \
-    tar xj --strip-components=2 -C /usr/local/bin/ phantomjs-2.1.1-linux-x86_64/bin/phantomjs
 
 RUN set -x; \
     mv /root/.buildout/default.cfg /opt/${USER}/.buildout/ && \

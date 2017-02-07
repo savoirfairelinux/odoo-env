@@ -60,12 +60,10 @@ RUN set -x; \
     sed 's|==| = |' /tmp/requirements.txt > buildout-requirements.txt && \
     sed 's|==| = |' /tmp/requirements-extra.txt > buildout-requirements-extra.txt && \
     echo "\n[versions]\n" >> buildout.cfg && \
-    curl -o get-pip.py -SL https://bootstrap.pypa.io/get-pip.py && \
     cat buildout-requirements.txt >> buildout.cfg && \
     cat buildout-requirements-extra.txt >> buildout.cfg && \
     python bootstrap-buildout.py && \
     bin/buildout && \
-    ls -la /opt/${USER}/.buildout/eggs && \
     curl -o get-pip.py -SL https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py && \
     pip install urllib3[secure] && \

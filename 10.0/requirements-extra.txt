@@ -9,3 +9,4 @@ imagesize==0.7.1
 pickleshare==0.7.4
 simplegeneric==0.8.1
 xlrd==0.9.4
+ofxparse==0.14

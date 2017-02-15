@@ -16,6 +16,11 @@ ENV dev_packages python-dev \
     libffi-dev \
     libgeoip-dev \
     libyaml-dev \
+    libtiff5-dev \
+    libjpeg8-dev \
+    libfreetype6-dev \
+    liblcms2-dev \
+    libwebp-dev \
     gcc \
     make \
     file
@@ -24,6 +29,8 @@ RUN set -x; \
     locale-gen en_US.UTF-8 && \
     update-locale && \
     echo 'LANG="en_US.UTF-8"' > /etc/default/locale
+
+ENV LANG en_US.UTF-8
 
 COPY buildout.cfg /fake_buildout/
 COPY requirements-extra.txt /tmp/
@@ -46,6 +53,8 @@ RUN set -x; \
 	curl \
 	bzip2 \
 	ssh \
+	geoip-database \
+	geoip-database-extra \
 	${dev_packages} \
         npm && \
     ln -s /usr/bin/nodejs /usr/bin/node && \

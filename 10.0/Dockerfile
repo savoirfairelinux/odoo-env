@@ -26,6 +26,10 @@ ENV dev_packages python-dev \
     file
 
 RUN set -x; \
+    apt-get update && \
+    apt-get install -y --no-install-recommends locales
+
+RUN set -x; \
     locale-gen en_US.UTF-8 && \
     update-locale && \
     echo 'LANG="en_US.UTF-8"' > /etc/default/locale
@@ -84,7 +88,7 @@ RUN set -x; \
     apt-get clean all
 
 RUN set -x; \
-    curl -SL http://download.gna.org/wkhtmltopdf/0.12/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz | \
+    curl -SL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz | \
     tar xJ --strip-components=2 -C /usr/local/bin/ wkhtmltox/bin/wkhtmltopdf
 
 RUN set -x; \

@@ -49,13 +49,17 @@ RUN set -x; \
 	patch \
 	ssh \
 	${dev_packages} \
+	node-less \
+	node-clean-css \
         npm && \
     ln -s /usr/bin/nodejs /usr/bin/node && \
-    npm install -g less less-plugin-clean-css && \
+    curl -o get-pip.py -SL https://bootstrap.pypa.io/get-pip.py && \
+    python get-pip.py && \
+    pip install six==1.7.3 && \
+    pip install urllib3[secure] && \
     cd /fake_buildout && \
     curl -o bootstrap-buildout.py -SL https://bootstrap.pypa.io/bootstrap-buildout.py && \
     curl -o /tmp/requirements.txt -SL https://github.com/odoo/odoo/raw/${VERSION}/requirements.txt && \
-    sed -i 's/pyparsing==1.5.7/pyparsing==2.1.10/' /tmp/requirements.txt && \
     awk -F== '{print "     " $1}' /tmp/requirements.txt >> buildout.cfg && \
     awk -F== '{print "     " $1}' /tmp/requirements-extra.txt >> buildout.cfg && \
     sed 's|==| = |' /tmp/requirements.txt > buildout-requirements.txt && \
@@ -65,11 +69,8 @@ RUN set -x; \
     cat buildout-requirements-extra.txt >> buildout.cfg && \
     python bootstrap-buildout.py && \
     bin/buildout && \
-    curl -o get-pip.py -SL https://bootstrap.pypa.io/get-pip.py && \
-    python get-pip.py && \
-    pip install urllib3[secure] && \
-    pip install -r /tmp/requirements.txt && \
-    pip install -r /tmp/requirements-extra.txt && \
+    #pip install -r /tmp/requirements.txt && \
+    #pip install -r /tmp/requirements-extra.txt && \
     cd .. && \
     rm -rf fake_buildout && \
     apt-get -y remove ${dev_packages} && \
